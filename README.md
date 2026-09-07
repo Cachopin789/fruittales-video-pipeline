@@ -1,16 +1,46 @@
-# FruitTales · preparación de vídeo con FFmpeg
+# FruitTales Video Pipeline
 
-Herramientas de PowerShell para preparar vídeos verticales y montajes largos a partir de material propio, con licencia o con autorización expresa. Añaden una marca propia, normalizan el formato y generan MP4 listos para revisar antes de publicar.
+![PowerShell](https://img.shields.io/badge/PowerShell-5391FE?style=for-the-badge&logo=powershell&logoColor=white)
+![FFmpeg](https://img.shields.io/badge/FFmpeg-007808?style=for-the-badge&logo=ffmpeg&logoColor=white)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](LICENSE)
+
+Pipeline de post-producción de vídeo para preparar Shorts y vídeos largos a partir de material propio, con licencia o con autorización expresa. Combina scripts de PowerShell y FFmpeg para automatizar tareas repetitivas y dejar cada resultado listo para revisión antes de publicar.
 
 > Una marca de agua no concede derechos de uso. Antes de publicar, verifica la licencia o el permiso de cada fuente y regístralo en `derechos.csv`.
+
+## Tabla de contenidos
+
+- [Descripción](#descripción)
+- [Características](#características)
+- [Requisitos](#requisitos)
+- [Instalación](#instalación)
+- [Uso](#uso)
+- [Configuración](#configuración)
+- [Estructura del proyecto](#estructura-del-proyecto)
+- [Licencia y derechos de contenido](#licencia-y-derechos-de-contenido)
+- [Próximas mejoras](#próximas-mejoras)
+
+## Descripción
+
+FruitTales Video Pipeline automatiza la preparación técnica de vídeo para el canal FruitTales. Normaliza material autorizado, aplica una marca propia, genera versiones verticales u horizontales y organiza el proceso de publicación.
+
+El proyecto no requiere dependencias de Python ni API keys: funciona con PowerShell, FFmpeg y `ffprobe`.
+
+## Características
+
+- Mejora visual moderada mediante reducción de ruido, ajuste de contraste/color y nitidez configurable.
+- Convierte y adapta vídeos a vertical 9:16 o horizontal 16:9 con fondo desenfocado cuando es necesario.
+- Añade una marca de agua mediante texto configurable o un PNG transparente.
+- Prepara flujos de publicación con títulos, descripciones, hashtags y prompts de miniatura para usar con IA.
+- Conserva el audio original y permite aplicar ajustes orientados a reducir riesgos de reclamaciones, siempre respetando los derechos del contenido.
 
 ## Requisitos
 
 - Windows PowerShell 5.1 o PowerShell 7.
 - [FFmpeg](https://ffmpeg.org/) y `ffprobe` instalados y disponibles en `PATH`.
-- Vídeos autorizados en formatos compatibles como MP4 o MOV.
+- Vídeos autorizados en formatos compatibles, como MP4 o MOV.
 
-Comprueba la instalación con:
+Comprueba que FFmpeg está disponible:
 
 ```powershell
 ffmpeg -version
@@ -20,51 +50,47 @@ ffprobe -version
 ## Instalación
 
 1. Clona el repositorio.
-2. Instala FFmpeg y asegúrate de que los comandos anteriores funcionan desde PowerShell.
-3. Opcionalmente, añade `assets/marca.png` (PNG con transparencia) para usar un logo; de lo contrario se usará la marca de texto configurada.
-4. Ajusta `config.psd1` si quieres modificar el texto de la marca, su posición o la calidad de codificación.
 
-No hay dependencias de Python ni claves API necesarias.
+   ```powershell
+   git clone https://github.com/Cachopin789/fruittales-video-pipeline.git
+   cd fruittales-video-pipeline
+   ```
 
-## Estructura
+2. Instala FFmpeg y confirma que `ffmpeg -version` y `ffprobe -version` funcionan desde PowerShell.
 
-```text
-assets/marca.png       Logo opcional para la marca de agua
-entrada/               Vídeos autorizados de entrada
-partes/                Episodios temporales para montajes largos (no se versiona)
-salida/                Vídeos, imágenes y registros generados (no se versiona)
-scripts/               Scripts de procesamiento
-config.psd1            Ajustes de salida y marca, sin credenciales
-derechos.csv           Registro de licencias y permisos
-```
+3. Opcionalmente, añade un logo PNG transparente en `assets/marca.png`. Si no existe, se utilizará el texto definido en `config.psd1`.
 
-## Scripts
+4. Ajusta `config.psd1` para cambiar la marca, posición, resolución, calidad o mejora visual.
 
-### `Iniciar.ps1`
+## Uso
 
-Es el punto de entrada interactivo. Muestra un menú para crear un Short o unir episodios en un vídeo largo. Desde la raíz del proyecto:
+### Menú interactivo
+
+`Iniciar.ps1` es el punto de entrada recomendado para crear un Short o unir episodios en un vídeo largo.
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\Iniciar.ps1
 ```
 
-### `scripts/Procesar-Short.ps1`
+### Crear un Short
 
-Convierte un vídeo autorizado en un Short vertical de 1080 × 1920. Aplica una mejora visual moderada, compone un fondo desenfocado cuando es necesario y añade el logo o texto de marca. El resultado se guarda en `salida/`.
+`Procesar-Short.ps1` convierte un vídeo autorizado en un Short vertical de 1080 × 1920, con fondo desenfocado, mejora visual y marca propia.
 
 ```powershell
 .\scripts\Procesar-Short.ps1 -Entrada .\entrada\clip.mp4
 ```
 
-Para decidir una ubicación concreta:
+Para indicar una salida concreta:
 
 ```powershell
-.\scripts\Procesar-Short.ps1 -Entrada .\entrada\clip.mp4 -Salida .\salida\mi-short.mp4
+.\scripts\Procesar-Short.ps1 `
+  -Entrada .\entrada\clip.mp4 `
+  -Salida .\salida\mi-short.mp4
 ```
 
-### `scripts/Crear-VideoLargo.ps1`
+### Crear un vídeo largo
 
-Normaliza y une al menos dos episodios ordenados por nombre dentro de una carpeta. Puede recortar los últimos segundos de cada parte para eliminar rótulos finales. Genera un vídeo vertical por defecto o un vídeo horizontal 16:9 con el contenido vertical centrado sobre un fondo desenfocado.
+`Crear-VideoLargo.ps1` normaliza y une al menos dos episodios ordenados por nombre. Puede recortar los últimos segundos de cada parte antes de unirlas.
 
 ```powershell
 .\scripts\Crear-VideoLargo.ps1 `
@@ -73,7 +99,7 @@ Normaliza y une al menos dos episodios ordenados por nombre dentro de una carpet
   -RecorteFinalSegundos 1
 ```
 
-Versión horizontal:
+Para crear una versión horizontal 16:9:
 
 ```powershell
 .\scripts\Crear-VideoLargo.ps1 `
@@ -82,33 +108,69 @@ Versión horizontal:
   -Formato Horizontal
 ```
 
-### `scripts/Crear-Lote-Largos.ps1`
+### Crear un lote de vídeos largos
 
-Agrupa automáticamente los archivos descargados con nombre `snaptik_*` que estén en la raíz local en lotes de una duración aproximada y llama a `Crear-VideoLargo.ps1` para crear cada montaje. Esos archivos de descarga y los resultados están excluidos de Git.
+`Crear-Lote-Largos.ps1` agrupa los archivos descargados con el patrón `snaptik_*` en lotes de duración aproximada y genera un vídeo largo por cada lote.
 
 ```powershell
-.\scripts\Crear-Lote-Largos.ps1 -ObjetivoMinutos 12 -Formato Vertical
+.\scripts\Crear-Lote-Largos.ps1 `
+  -ObjetivoMinutos 12 `
+  -Formato Vertical
 ```
 
-Puedes retomar un lote desde un número concreto:
+Para retomar el proceso desde un lote específico:
 
 ```powershell
-.\scripts\Crear-Lote-Largos.ps1 -ObjetivoMinutos 12 -Formato Horizontal -DesdeNumero 3
+.\scripts\Crear-Lote-Largos.ps1 `
+  -ObjetivoMinutos 12 `
+  -Formato Horizontal `
+  -DesdeNumero 3
 ```
 
 ## Configuración
 
-`config.psd1` controla la resolución, calidad, texto de marca, fuente, márgenes y mejora visual. No contiene API keys ni datos privados. Ajusta estos valores con moderación:
+`config.psd1` controla el aspecto y la codificación de salida. No contiene API keys ni datos personales.
 
 - `MarcaTexto`: texto usado si no existe `assets/marca.png`.
-- `OpacidadMarca`, `MargenPx` y `EscalaLogoPx`: aspecto y posición de la marca.
-- `CalidadCrf` y `Preset`: equilibrio entre calidad, tamaño y tiempo de codificación.
-- `MejoraActiva`, `ReduccionRuido` y `Nitidez`: procesamiento visual previo a la marca.
+- `OpacidadMarca`, `MargenPx` y `EscalaLogoPx`: tamaño y posición de la marca.
+- `CalidadCrf` y `Preset`: equilibrio entre calidad, peso y tiempo de codificación.
+- `MejoraActiva`, `ReduccionRuido` y `Nitidez`: ajustes de mejora visual.
 
-## Registro de derechos
+## Estructura del proyecto
 
-Completa una fila de `derechos.csv` por cada fuente, indicando origen, titular de derechos, licencia o permiso y fecha de verificación. El archivo no debe contener tokens, cuentas ni datos personales innecesarios.
+```text
+.
+├── Iniciar.ps1                      # Menú interactivo principal
+├── config.psd1                      # Ajustes de marca, vídeo y calidad
+├── derechos.csv                     # Registro de fuentes, licencias y permisos
+├── assets/
+│   └── marca.png                    # Logo opcional con transparencia
+├── entrada/                         # Vídeos autorizados de entrada
+├── partes/                          # Episodios temporales para vídeos largos
+├── salida/                          # Vídeos, imágenes y logs generados
+├── scripts/
+│   ├── Procesar-Short.ps1           # Genera Shorts verticales
+│   ├── Crear-VideoLargo.ps1         # Normaliza y une episodios
+│   └── Crear-Lote-Largos.ps1        # Crea lotes de vídeos largos
+└── plantillas/
+    └── ficha-publicacion.md         # Plantilla de publicación y metadatos
+```
 
-## Archivos no versionados
+Las carpetas `partes/` y `salida/`, los vídeos, logs, descargas `snaptik_*`, entornos virtuales y `.env` están excluidos mediante `.gitignore`.
 
-El `.gitignore` evita subir vídeos, descargas `snaptik_*`, resultados de `salida/`, partes temporales, logs, imágenes de frame, entornos virtuales y `.env`. Así el repositorio conserva únicamente scripts, configuración sin claves, documentación y activos que decidas incluir deliberadamente.
+## Licencia y derechos de contenido
+
+El código de este repositorio se distribuye bajo la [licencia MIT](LICENSE).
+
+El código del repositorio y los derechos sobre los vídeos son asuntos distintos:
+
+- Usa únicamente material propio, con licencia o con autorización expresa.
+- Registra en `derechos.csv` la fuente, titular de derechos, licencia o permiso y fecha de verificación.
+- Una marca de agua no convierte una obra de terceros en propia ni evita reclamaciones de copyright.
+- Si la licencia exige atribución, inclúyela al publicar el contenido.
+
+## Próximas mejoras
+
+- Integrar generación asistida de metadatos de publicación desde una plantilla.
+- Añadir validaciones automáticas de duración, formato y resolución de los vídeos de entrada.
+- Crear un modo de vista previa para revisar la marca, el recorte y el formato antes de codificar el vídeo final.
