@@ -1,0 +1,32 @@
+# Credenciales y configuración local
+.env
+
+# Entornos y cachés de Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+
+# Vídeos y descargas locales
+*.mp4
+*.mov
+snaptik_*
+
+# Archivos generados por el procesamiento
+salida/
+partes/
+frames/
+frame*.jpg
+frame*.jpeg
+
+# Registros y archivos temporales
+*.log
+*.tmp
+*.temp
+*.swp
+*~
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+Desktop.ini
