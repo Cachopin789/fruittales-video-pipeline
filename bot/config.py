@@ -1,0 +1,25 @@
+"""Configuracion privada leida desde .env."""
+from dataclasses import dataclass
+import os
+from dotenv import load_dotenv
+
+@dataclass(frozen=True)
+class Settings:
+    discord_token: str
+    youtube_api_key: str
+    discord_channel_id: int
+    youtube_channel_handle: str
+    check_interval_minutes: int
+
+def load_settings() -> Settings:
+    load_dotenv()
+    missing = [key for key in ("DISCORD_TOKEN", "YOUTUBE_API_KEY", "DISCORD_CHANNEL_ID") if not os.getenv(key)]
+    if missing:
+        raise RuntimeError("Faltan valores en .env: " + ", ".join(missing))
+    try:
+        requested_interval = int(os.getenv("CHECK_INTERVAL_MINUTES", "30"))
+        # El requisito del proyecto prohíbe consultas más frecuentes de 30 minutos.
+        safe_interval = max(30, requested_interval)
+        return Settings(os.environ["DISCORD_TOKEN"], os.environ["YOUTUBE_API_KEY"], int(os.environ["DISCORD_CHANNEL_ID"]), os.getenv("YOUTUBE_CHANNEL_HANDLE", "FruitTalesES").lstrip("@"), safe_interval)
+    except ValueError as error:
+        raise RuntimeError("DISCORD_CHANNEL_ID y CHECK_INTERVAL_MINUTES deben ser numeros.") from error

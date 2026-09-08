@@ -1,11 +1,16 @@
 # Credenciales y configuración local
 .env
+.env.*
+!.env.example
 
 # Entornos y cachés de Python
 .venv/
 venv/
+env/
 __pycache__/
 *.py[cod]
+bot/logs/
+bot/state.json
 
 # Vídeos y descargas locales
 *.mp4

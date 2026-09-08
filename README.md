@@ -36,6 +36,7 @@ El proyecto no requiere dependencias de Python ni API keys: funciona con PowerSh
 - 💧 Añade una marca de agua mediante texto configurable o un PNG transparente.
 - ✍️ Prepara flujos de publicación con títulos, descripciones, hashtags y prompts de miniatura para usar con IA.
 - 🔊 Conserva el audio original y permite aplicar ajustes orientados a reducir riesgos de reclamaciones, siempre respetando los derechos del contenido.
+- 🤖 Incluye un bot de Discord independiente en `bot/`, con avisos de nuevos vídeos de YouTube y comandos de estadísticas.
 
 <a id="requisitos"></a>
 ## 📋 Requisitos
