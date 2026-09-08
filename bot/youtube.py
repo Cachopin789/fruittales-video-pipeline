@@ -1,5 +1,6 @@
 """Consultas asincronas a YouTube Data API v3."""
 from dataclasses import dataclass
+import random
 import aiohttp
 
 class YouTubeAPIError(RuntimeError): pass
@@ -9,6 +10,10 @@ class Video:
     video_id: str; title: str; published_at: str | None; thumbnail_url: str | None
     @property
     def url(self): return f"https://www.youtube.com/watch?v={self.video_id}"
+
+@dataclass(frozen=True)
+class ChannelInfo:
+    title: str; description: str; published_at: str; url: str; thumbnail_url: str | None
 
 class YouTubeClient:
     def __init__(self, key: str, handle: str):
@@ -37,3 +42,16 @@ class YouTubeClient:
         if not item: raise YouTubeAPIError("No se pudieron obtener estadisticas.")
         stat = item["statistics"]
         return item["snippet"]["title"], (None if stat.get("hiddenSubscriberCount") else int(stat["subscriberCount"])), int(stat["videoCount"]), int(stat["viewCount"])
+    async def channel_info(self):
+        await self._channel(); data = await self._get("channels", part="snippet", id=self.channel_id); item = data.get("items", [None])[0]
+        if not item: raise YouTubeAPIError("No se pudo obtener la información del canal.")
+        snippet = item["snippet"]; thumbs = snippet.get("thumbnails", {}); image = thumbs.get("high") or thumbs.get("medium") or thumbs.get("default")
+        description = snippet.get("description", "Sin descripción pública.").strip() or "Sin descripción pública."
+        return ChannelInfo(snippet["title"], description, snippet.get("publishedAt", ""), f"https://www.youtube.com/@{self.handle}", image.get("url") if image else None)
+    async def random_video(self):
+        """Elige entre los 50 vídeos publicados más recientes para controlar la cuota."""
+        await self._channel(); data = await self._get("playlistItems", part="snippet,contentDetails", playlistId=self.uploads_id, maxResults="50")
+        items = [item for item in data.get("items", []) if item.get("contentDetails", {}).get("videoId")]
+        if not items: raise YouTubeAPIError("El canal no tiene vídeos públicos.")
+        item = random.choice(items); snippet = item["snippet"]; thumbs = snippet.get("thumbnails", {}); image = thumbs.get("high") or thumbs.get("medium") or thumbs.get("default")
+        return Video(item["contentDetails"]["videoId"], snippet["title"], snippet.get("publishedAt"), image.get("url") if image else None)

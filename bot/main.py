@@ -1,13 +1,15 @@
 """Punto de entrada del bot profesional FruitTales."""
 import asyncio
+from datetime import datetime
 import logging
 from time import monotonic
 import discord
 from discord.ext import commands, tasks
 from config import load_settings
-from embeds import stats_embed, video_embed
+from embeds import channel_embed, help_embed, stats_embed, video_embed
 from logging_setup import configure_logging
-from schedule import is_due, madrid_now
+from programacion import next_scheduled_video
+from schedule import is_due, is_notification_window, madrid_now
 from state import last_check, read, save
 from youtube import YouTubeAPIError, YouTubeClient
 
@@ -73,6 +75,9 @@ async def ping(interaction: discord.Interaction):
 async def uptime(interaction: discord.Interaction):
     seconds = int(monotonic() - bot.started_at); hours, remainder = divmod(seconds, 3600); minutes, seconds = divmod(remainder, 60)
     await interaction.response.send_message(f"🟢 En línea desde hace **{hours} h {minutes} min {seconds} s**.", ephemeral=True)
+@bot.tree.command(name="ayuda", description="Muestra todos los comandos disponibles.")
+async def ayuda(interaction: discord.Interaction):
+    await interaction.response.send_message(embed=help_embed(), ephemeral=True)
 @bot.tree.command(name="ultimovideo", description="Muestra el último vídeo publicado.")
 async def ultimovideo(interaction: discord.Interaction):
     await interaction.response.defer(thinking=True)
@@ -80,6 +85,62 @@ async def ultimovideo(interaction: discord.Interaction):
         video = await retry(bot.youtube.latest_video, "Consulta de /ultimovideo")
         await interaction.followup.send(embed=video_embed(video, "Último vídeo de FruitTalesES"))
     except YouTubeAPIError as error: await interaction.followup.send(f"⚠️ No pude consultar YouTube ahora mismo: {error}", ephemeral=True)
+@bot.tree.command(name="canal", description="Muestra información general de FruitTalesES.")
+async def canal(interaction: discord.Interaction):
+    await interaction.response.defer(thinking=True)
+    try:
+        info = await retry(bot.youtube.channel_info, "Consulta de /canal")
+        await interaction.followup.send(embed=channel_embed(info))
+    except YouTubeAPIError as error: await interaction.followup.send(f"⚠️ No pude consultar el canal ahora mismo: {error}", ephemeral=True)
+@bot.tree.command(name="random", description="Recomienda un vídeo aleatorio de FruitTalesES.")
+async def random_video(interaction: discord.Interaction):
+    await interaction.response.defer(thinking=True)
+    try:
+        video = await retry(bot.youtube.random_video, "Consulta de /random")
+        await interaction.followup.send(embed=video_embed(video, "🎲 Recomendación aleatoria de FruitTalesES"))
+    except YouTubeAPIError as error: await interaction.followup.send(f"⚠️ No pude elegir un vídeo ahora mismo: {error}", ephemeral=True)
+@bot.tree.command(name="proximo", description="Muestra el próximo vídeo anunciado.")
+async def proximo(interaction: discord.Interaction):
+    scheduled = next_scheduled_video()
+    if scheduled:
+        moment = scheduled.published_at
+        title = scheduled.title
+        url = scheduled.url
+    elif settings.next_video_at:
+        try:
+            moment = datetime.fromisoformat(settings.next_video_at)
+            if moment.tzinfo is None: moment = moment.replace(tzinfo=madrid_now().tzinfo)
+            title = settings.next_video_title or "Próxima aventura de FruitTales"
+            url = settings.next_video_url
+            if moment <= madrid_now():
+                await interaction.response.send_message("🍊 No hay más publicaciones futuras en el calendario por ahora. Añade la siguiente a `programacion.json`.", ephemeral=True)
+                return
+        except ValueError:
+            await interaction.response.send_message("⚠️ La fecha configurada para el próximo vídeo no tiene un formato válido. Usa `AAAA-MM-DDTHH:MM`.", ephemeral=True)
+            return
+    else:
+        await interaction.response.send_message("🍊 Aún no hay una próxima publicación programada. Vuelve pronto para descubrir la siguiente historia.", ephemeral=True)
+        return
+    try:
+        embed = discord.Embed(title="📅 Próximo vídeo de FruitTalesES", color=0xE74C3C, timestamp=moment)
+        embed.add_field(name="🎬 Título", value=title, inline=False)
+        embed.add_field(name="🕒 Hora de España", value=moment.strftime("%d/%m/%Y · %H:%M"), inline=True)
+        if url: embed.add_field(name="🔗 Enlace", value=f"[Ver programación]({url})", inline=True)
+        embed.set_footer(text="Información configurada por el equipo de FruitTales")
+        await interaction.response.send_message(embed=embed)
+    except ValueError:
+        await interaction.response.send_message("⚠️ La fecha configurada para el próximo vídeo no tiene un formato válido. Usa `AAAA-MM-DDTHH:MM`.", ephemeral=True)
+@bot.tree.command(name="estado", description="Muestra el estado del monitor de avisos.")
+async def estado(interaction: discord.Interaction):
+    now = madrid_now(); state = read(); checked = state.get("last_check")
+    active = is_notification_window(now)
+    embed = discord.Embed(title="🛡️ Estado de FruitTales Guardian", color=0x2ECC71 if active else 0xF39C12)
+    embed.add_field(name="Monitor", value="🟢 En franja de avisos" if active else "🌙 En silencio programado", inline=True)
+    embed.add_field(name="Hora de España", value=now.strftime("%H:%M · %d/%m/%Y"), inline=True)
+    embed.add_field(name="Última comprobación", value=checked or "Aún no se ha realizado", inline=False)
+    embed.add_field(name="Horario", value="YouTube se consulta solo entre **15:00 y 21:00** cada 30 minutos como máximo.", inline=False)
+    embed.set_footer(text="🍊 FruitTales Guardian · Monitor de YouTube")
+    await interaction.response.send_message(embed=embed, ephemeral=True)
 @bot.tree.command(name="stats", description="Muestra estadísticas actuales de FruitTalesES.")
 async def stats(interaction: discord.Interaction):
     await interaction.response.defer(thinking=True)

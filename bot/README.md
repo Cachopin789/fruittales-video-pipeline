@@ -1,6 +1,21 @@
 # FruitTales Bot
 
-Bot profesional e independiente del pipeline de vídeo. Envía avisos de nuevos vídeos de `FruitTalesES` y ofrece `/stats`, `/ultimovideo`, `/ping` y `/uptime`.
+**FruitTales Guardian** es un bot profesional e independiente del pipeline de vídeo. Envía avisos de nuevos vídeos de `FruitTalesES`, consulta información pública del canal y acompaña a la comunidad con comandos útiles.
+
+## 🍊 Comandos
+
+| Comando | Para qué sirve |
+| :-- | :-- |
+| `/ayuda` | Muestra la guía de comandos en Discord. |
+| `/canal` | Enseña datos generales del canal de YouTube. |
+| `/stats` | Muestra suscriptores, vídeos y visualizaciones. |
+| `/ultimovideo` | Comparte el último vídeo publicado. |
+| `/random` | Recomienda un vídeo aleatorio entre los 50 más recientes. |
+| `/proximo` | Muestra la próxima publicación anunciada. |
+| `/estado` | Indica el estado y horario del monitor. |
+| `/ping` y `/uptime` | Comprueban latencia y tiempo en línea. |
+
+Hay una explicación y ejemplo de cada comando en [`comandos-docs/`](comandos-docs/).
 
 ## Horario de avisos
 
@@ -25,6 +40,14 @@ python main.py
 
 Completa antes `bot/.env` y guárdalo. Nunca compartas el token o la API key ni subas `.env` a GitHub.
 
+`/proximo` usa primero [`programacion.json`](programacion.json): selecciona automáticamente la primera publicación futura y cambia a la siguiente al pasar su fecha. Para añadir una nueva, agrega un bloque con título, fecha `AAAA-MM-DDTHH:MM` (hora de España) y enlace opcional. Las variables siguientes siguen disponibles como alternativa si no existe un calendario:
+
+```env
+NEXT_VIDEO_AT=2026-09-10T18:00
+NEXT_VIDEO_TITLE=La próxima aventura de FruitTales
+NEXT_VIDEO_URL=https://www.youtube.com/@FruitTalesES
+```
+
 ## Discord
 
 1. Crea una aplicación en [Discord Developer Portal](https://discord.com/developers/applications) y agrega un bot.
@@ -45,11 +68,23 @@ El bot registra su actividad tanto en la consola como en `bot/logs/bot.log`. Con
 - Si no envía avisos, confirma el ID y que tenga permisos en el canal.
 - Si falla YouTube, confirma que la API está habilitada y que la API key es correcta.
 
-## Hosting 24/7: Railway o Render
+## 🚀 Hosting 24/7 con Railway
 
-No subas `.env`; crea sus variables como secretos en la plataforma. Los planes gratuitos y sus límites cambian, así que consulta las condiciones vigentes.
+Recomiendo **Railway** por ser la opción más directa para principiantes: conecta el repositorio, instala dependencias y ejecuta el bot. Un bot necesita un proceso persistente; los créditos y planes gratuitos cambian con el tiempo, así que revisa las condiciones de Railway antes de desplegar.
 
-- **Railway:** conecta el repositorio, usa `bot` como **Root Directory**, añade las variables y arranca con `python main.py`.
-- **Render:** crea un **Background Worker**, usa `bot` como directorio raíz, `pip install -r requirements.txt` como build command y `python main.py` como start command.
+1. Entra en [Railway](https://railway.app/) y crea una cuenta usando **Continue with GitHub**.
+2. Pulsa **New Project** > **Deploy from GitHub repo** y autoriza el acceso a `fruittales-video-pipeline`.
+3. Selecciona el repositorio. En la configuración del servicio, establece **Root Directory** como `bot`.
+4. Railway detectará Python. Si te pide comandos, usa:
 
-Un bot requiere un worker persistente; si un plan gratuito suspende workers, no podrá mantenerse conectado 24/7.
+   ```text
+   Build: pip install -r requirements.txt
+   Start: python main.py
+   ```
+
+5. Abre la pestaña **Variables** y crea, una a una, las mismas variables de `bot/.env`: `DISCORD_TOKEN`, `YOUTUBE_API_KEY`, `DISCORD_CHANNEL_ID`, `YOUTUBE_CHANNEL_HANDLE`, `CHECK_INTERVAL_MINUTES` y, si la usas, las variables `NEXT_VIDEO_*`.
+6. No subas ni copies el archivo `.env` al repositorio: Railway conserva esos valores como secretos del servicio.
+7. Pulsa **Deploy**. En **Deployments > View Logs** deberías ver mensajes como `Comandos de aplicación sincronizados` y `Conectado como...`.
+8. En Discord, prueba `/ping` y `/estado`. Si ambos responden, FruitTales Guardian funciona desde Railway y tu ordenador puede estar apagado.
+
+Si Railway detiene el servicio por límites de plan, el bot se desconectará hasta que el servicio vuelva a estar activo. Render es una alternativa, pero sus Background Workers no tienen actualmente un plan gratuito.

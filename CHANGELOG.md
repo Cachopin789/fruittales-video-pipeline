@@ -2,6 +2,21 @@
 
 Todos los cambios relevantes de FruitTales se documentan en este archivo.
 
+## [2026-09-08] - Ampliación de FruitTales Guardian
+
+### Añadido
+
+- Comandos `/ayuda`, `/canal`, `/random`, `/proximo` y `/estado`.
+- Configuración opcional de la próxima publicación mediante `NEXT_VIDEO_AT`, `NEXT_VIDEO_TITLE` y `NEXT_VIDEO_URL`.
+- Documentación Markdown individual para todos los comandos dentro de `bot/comandos-docs/`.
+- Guía paso a paso para desplegar FruitTales Guardian en Railway y comprobar su funcionamiento.
+- Calendario versionado `bot/programacion.json` para que `/proximo` avance automáticamente a la siguiente publicación programada.
+
+### Mejorado
+
+- Identidad visual y mensajes del bot con la marca FruitTales Guardian, embeds y mensajes de error más cercanos.
+- Cliente de YouTube con consulta de información general del canal y recomendación aleatoria limitada a los 50 vídeos más recientes para controlar la cuota.
+
 ## [2026-09-08] - Bot de Discord para FruitTalesES
 
 ### Añadido
