@@ -8,33 +8,37 @@ Pipeline de post-producción de vídeo para preparar Shorts y vídeos largos a p
 
 > Una marca de agua no concede derechos de uso. Antes de publicar, verifica la licencia o el permiso de cada fuente y regístralo en `derechos.csv`.
 
-## Tabla de contenidos
+<a id="tabla-de-contenidos"></a>
+## 🧭 Tabla de contenidos
 
-- [Descripción](#descripción)
-- [Características](#características)
+- [Descripción](#descripcion)
+- [Características](#caracteristicas)
 - [Requisitos](#requisitos)
-- [Instalación](#instalación)
+- [Instalación](#instalacion)
 - [Uso](#uso)
-- [Configuración](#configuración)
+- [Configuración](#configuracion)
 - [Estructura del proyecto](#estructura-del-proyecto)
 - [Licencia y derechos de contenido](#licencia-y-derechos-de-contenido)
-- [Próximas mejoras](#próximas-mejoras)
+- [Próximas mejoras](#proximas-mejoras)
 
-## Descripción
+<a id="descripcion"></a>
+## 🍊 Descripción
 
 FruitTales Video Pipeline automatiza la preparación técnica de vídeo para el canal FruitTales. Normaliza material autorizado, aplica una marca propia, genera versiones verticales u horizontales y organiza el proceso de publicación.
 
 El proyecto no requiere dependencias de Python ni API keys: funciona con PowerShell, FFmpeg y `ffprobe`.
 
-## Características
+<a id="caracteristicas"></a>
+## ✨ Características
 
-- Mejora visual moderada mediante reducción de ruido, ajuste de contraste/color y nitidez configurable.
-- Convierte y adapta vídeos a vertical 9:16 o horizontal 16:9 con fondo desenfocado cuando es necesario.
-- Añade una marca de agua mediante texto configurable o un PNG transparente.
-- Prepara flujos de publicación con títulos, descripciones, hashtags y prompts de miniatura para usar con IA.
-- Conserva el audio original y permite aplicar ajustes orientados a reducir riesgos de reclamaciones, siempre respetando los derechos del contenido.
+- 🎨 Mejora visual moderada mediante reducción de ruido, ajuste de contraste/color y nitidez configurable.
+- 📐 Convierte y adapta vídeos a vertical 9:16 o horizontal 16:9 con fondo desenfocado cuando es necesario.
+- 💧 Añade una marca de agua mediante texto configurable o un PNG transparente.
+- ✍️ Prepara flujos de publicación con títulos, descripciones, hashtags y prompts de miniatura para usar con IA.
+- 🔊 Conserva el audio original y permite aplicar ajustes orientados a reducir riesgos de reclamaciones, siempre respetando los derechos del contenido.
 
-## Requisitos
+<a id="requisitos"></a>
+## 📋 Requisitos
 
 - Windows PowerShell 5.1 o PowerShell 7.
 - [FFmpeg](https://ffmpeg.org/) y `ffprobe` instalados y disponibles en `PATH`.
@@ -47,7 +51,8 @@ ffmpeg -version
 ffprobe -version
 ```
 
-## Instalación
+<a id="instalacion"></a>
+## ⚙️ Instalación
 
 1. Clona el repositorio.
 
@@ -62,7 +67,8 @@ ffprobe -version
 
 4. Ajusta `config.psd1` para cambiar la marca, posición, resolución, calidad o mejora visual.
 
-## Uso
+<a id="uso"></a>
+## 🎬 Uso
 
 ### Menú interactivo
 
@@ -127,7 +133,8 @@ Para retomar el proceso desde un lote específico:
   -DesdeNumero 3
 ```
 
-## Configuración
+<a id="configuracion"></a>
+## 🔧 Configuración
 
 `config.psd1` controla el aspecto y la codificación de salida. No contiene API keys ni datos personales.
 
@@ -136,7 +143,8 @@ Para retomar el proceso desde un lote específico:
 - `CalidadCrf` y `Preset`: equilibrio entre calidad, peso y tiempo de codificación.
 - `MejoraActiva`, `ReduccionRuido` y `Nitidez`: ajustes de mejora visual.
 
-## Estructura del proyecto
+<a id="estructura-del-proyecto"></a>
+## 📂 Estructura del proyecto
 
 ```text
 .
@@ -158,7 +166,8 @@ Para retomar el proceso desde un lote específico:
 
 Las carpetas `partes/` y `salida/`, los vídeos, logs, descargas `snaptik_*`, entornos virtuales y `.env` están excluidos mediante `.gitignore`.
 
-## Licencia y derechos de contenido
+<a id="licencia-y-derechos-de-contenido"></a>
+## 📜 Licencia y derechos de contenido
 
 El código de este repositorio se distribuye bajo la [licencia MIT](LICENSE).
 
@@ -169,7 +178,8 @@ El código del repositorio y los derechos sobre los vídeos son asuntos distinto
 - Una marca de agua no convierte una obra de terceros en propia ni evita reclamaciones de copyright.
 - Si la licencia exige atribución, inclúyela al publicar el contenido.
 
-## Próximas mejoras
+<a id="proximas-mejoras"></a>
+## 🚀 Próximas mejoras
 
 - Integrar generación asistida de metadatos de publicación desde una plantilla.
 - Añadir validaciones automáticas de duración, formato y resolución de los vídeos de entrada.
