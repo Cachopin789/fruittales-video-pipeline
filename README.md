@@ -24,14 +24,14 @@ Pipeline de post-producción de vídeo para preparar Shorts y vídeos largos a p
 <a id="descripcion"></a>
 ## 🍊 Descripción
 
-FruitTales Video Pipeline automatiza la preparación técnica de vídeo para el canal FruitTales. Normaliza material autorizado, aplica una marca propia, genera versiones verticales u horizontales y organiza el proceso de publicación.
+FruitTales Video Pipeline se encarga de la post-producción técnica de partes de vídeo ya creadas para las historias de FruitTales. No genera guiones ni contenido narrativo: compila las partes indicadas, las ordena, normaliza su formato, aplica una marca propia y prepara el resultado final para revisión antes de publicar.
 
 El proyecto no requiere dependencias de Python ni API keys: funciona con PowerShell, FFmpeg y `ffprobe`.
 
 <a id="caracteristicas"></a>
 ## ✨ Características
 
-- 🎨 Mejora visual moderada mediante reducción de ruido, ajuste de contraste/color y nitidez configurable.
+- 🧩 Compila, ordena y normaliza partes de vídeo existentes para crear Shorts y vídeos largos, aplicando reducción de ruido, ajuste de contraste/color y nitidez configurable.
 - 📐 Convierte y adapta vídeos a vertical 9:16 o horizontal 16:9 con fondo desenfocado cuando es necesario.
 - 💧 Añade una marca de agua mediante texto configurable o un PNG transparente.
 - ✍️ Prepara flujos de publicación con títulos, descripciones, hashtags y prompts de miniatura para usar con IA.
