@@ -13,10 +13,15 @@
 | `/random` | Recomienda un vídeo aleatorio entre los 50 más recientes. |
 | `/proximo` | Muestra la próxima publicación anunciada. |
 | `/estado` | Indica el estado y horario del monitor. |
+| `/sugerir` | Envía una idea de la comunidad al canal de sugerencias. |
+| `/encuesta` | Crea una votación con reacciones para la comunidad. |
+| `/normas` | Da acceso rápido al canal de reglas. |
 | `/configurar-servidor` | Crea una estructura profesional de canales y roles una sola vez. |
 | `/ping` y `/uptime` | Comprueban latencia y tiempo en línea. |
 
 Hay una explicación y ejemplo de cada comando en [`comandos-docs/`](comandos-docs/).
+
+`/sugerir` usa `💡│sugerencias` por defecto. Si prefieres enviar las propuestas a un canal privado de moderación, añade su ID como `SUGGESTIONS_CHANNEL_ID` en `bot/.env`.
 
 ## Horario de avisos
 

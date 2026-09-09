@@ -41,6 +41,7 @@ def help_embed() -> discord.Embed:
     embed = discord.Embed(title="🍊 FruitTales Guardian · Ayuda", description="Tu compañero para seguir el canal FruitTalesES.", color=BRAND_RED)
     embed.add_field(name="📺 Canal", value="`/canal` · información general\n`/stats` · estadísticas actuales\n`/ultimovideo` · último vídeo\n`/random` · recomendación aleatoria", inline=False)
     embed.add_field(name="🔔 Seguimiento", value="`/proximo` · próxima publicación anunciada\n`/estado` · estado del monitor y horario", inline=False)
+    embed.add_field(name="💬 Comunidad", value="`/sugerir` · propone una idea\n`/encuesta` · crea una votación\n`/normas` · consulta las reglas", inline=False)
     embed.add_field(name="🛠️ Bot", value="`/ping` · latencia\n`/uptime` · tiempo en línea\n`/ayuda` · esta guía\n`/configurar-servidor` · estructura inicial (solo propietario)", inline=False)
     embed.set_footer(text="Los avisos automáticos se envían entre 15:00 y 21:00, hora de España.")
     return embed

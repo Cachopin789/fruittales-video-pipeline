@@ -6,6 +6,7 @@ from time import monotonic
 import discord
 from discord.ext import commands, tasks
 from config import load_settings
+from community import NUMBER_EMOJIS, find_text_channel, poll_embed, suggestion_embed
 from embeds import channel_embed, help_embed, stats_embed, video_embed
 from logging_setup import configure_logging
 from programacion import next_scheduled_video
@@ -123,6 +124,59 @@ async def uptime(interaction: discord.Interaction):
 @bot.tree.command(name="ayuda", description="Muestra todos los comandos disponibles.")
 async def ayuda(interaction: discord.Interaction):
     await interaction.response.send_message(embed=help_embed(), ephemeral=True)
+@bot.tree.command(name="sugerir", description="Envía una idea o sugerencia para FruitTales.")
+async def sugerir(interaction: discord.Interaction, idea: str):
+    if interaction.guild is None:
+        await interaction.response.send_message("⚠️ Las sugerencias solo se pueden enviar desde el servidor de FruitTales.", ephemeral=True)
+        return
+    idea = idea.strip()
+    if len(idea) < 5 or len(idea) > 1000:
+        await interaction.response.send_message("⚠️ Escribe una sugerencia de entre 5 y 1.000 caracteres.", ephemeral=True)
+        return
+    channel = None
+    if settings.suggestions_channel_id:
+        candidate = bot.get_channel(settings.suggestions_channel_id) or await bot.fetch_channel(settings.suggestions_channel_id)
+        if isinstance(candidate, discord.TextChannel): channel = candidate
+    channel = channel or find_text_channel(interaction.guild, "💡│sugerencias", "sugerencias")
+    if channel is None:
+        await interaction.response.send_message("⚠️ No encuentro el canal de sugerencias. Ejecuta `/configurar-servidor` o configura `SUGGESTIONS_CHANNEL_ID`.", ephemeral=True)
+        return
+    try:
+        await channel.send(embed=suggestion_embed(interaction.user, idea), allowed_mentions=discord.AllowedMentions.none())
+        await interaction.response.send_message("🍊 ¡Gracias! Tu sugerencia ya llegó al equipo de FruitTales.", ephemeral=True)
+    except discord.DiscordException as error:
+        logger.error("No se pudo enviar una sugerencia: %s", error)
+        await interaction.response.send_message("⚠️ No pude enviar tu sugerencia ahora mismo. Inténtalo de nuevo más tarde.", ephemeral=True)
+@bot.tree.command(name="encuesta", description="Crea una encuesta para la comunidad.")
+async def encuesta(interaction: discord.Interaction, pregunta: str, opcion_1: str, opcion_2: str, opcion_3: str | None = None, opcion_4: str | None = None):
+    if interaction.guild is None or not isinstance(interaction.channel, (discord.TextChannel, discord.Thread)):
+        await interaction.response.send_message("⚠️ Las encuestas solo se pueden crear en un canal de texto del servidor.", ephemeral=True)
+        return
+    if interaction.user.id != settings.owner_user_id and not interaction.user.guild_permissions.manage_guild:
+        await interaction.response.send_message("🔒 Solo el propietario o el equipo de moderación puede crear encuestas.", ephemeral=True)
+        return
+    options = [option.strip() for option in (opcion_1, opcion_2, opcion_3, opcion_4) if option and option.strip()]
+    if len(pregunta.strip()) < 5 or len(pregunta) > 256 or any(len(option) > 150 for option in options):
+        await interaction.response.send_message("⚠️ Revisa la pregunta y las opciones: usa textos breves y claros.", ephemeral=True)
+        return
+    await interaction.response.send_message(embed=poll_embed(pregunta.strip(), options, interaction.user))
+    message = await interaction.original_response()
+    try:
+        for emoji in NUMBER_EMOJIS[:len(options)]:
+            await message.add_reaction(emoji)
+    except discord.DiscordException as error:
+        logger.warning("Encuesta creada sin todas las reacciones: %s", error)
+@bot.tree.command(name="normas", description="Muestra dónde consultar las reglas del servidor.")
+async def normas(interaction: discord.Interaction):
+    if interaction.guild is None:
+        await interaction.response.send_message("⚠️ Este comando solo está disponible dentro del servidor.", ephemeral=True)
+        return
+    rules_channel = find_text_channel(interaction.guild, "📜│reglas", "reglas")
+    if rules_channel:
+        embed = discord.Embed(title="📜 Normas de FruitTales", description=f"Consulta las normas completas en {rules_channel.mention}. Gracias por mantener una comunidad amable y divertida.", color=0xE74C3C)
+    else:
+        embed = discord.Embed(title="📜 Normas de FruitTales", description="Aún no hay un canal de normas configurado. Un administrador puede crearlo con `/configurar-servidor`.", color=0xF39C12)
+    await interaction.response.send_message(embed=embed, ephemeral=True)
 @bot.tree.command(name="ultimovideo", description="Muestra el último vídeo publicado.")
 async def ultimovideo(interaction: discord.Interaction):
     await interaction.response.defer(thinking=True)

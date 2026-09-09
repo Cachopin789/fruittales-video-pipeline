@@ -2,6 +2,15 @@
 
 Todos los cambios relevantes de FruitTales se documentan en este archivo.
 
+## [2026-09-09] - Funciones de comunidad
+
+### Añadido
+
+- `/sugerir` para recibir propuestas de la comunidad en un canal configurado.
+- `/encuesta` para crear votaciones de dos a cuatro opciones con reacciones.
+- `/normas` para dirigir a las personas al canal de reglas.
+- Documentación individual de los nuevos comandos y configuración opcional de `SUGGESTIONS_CHANNEL_ID`.
+
 ## [2026-09-09] - Estructura visual del servidor Discord
 
 ### Mejorado
