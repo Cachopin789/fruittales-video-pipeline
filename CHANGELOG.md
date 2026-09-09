@@ -2,6 +2,13 @@
 
 Todos los cambios relevantes de FruitTales se documentan en este archivo.
 
+## [2026-09-09] - Aclaración de documentación del proyecto
+
+### Corregido
+
+- README principal actualizado para diferenciar el pipeline de vídeo, que no requiere Python ni credenciales, del componente independiente FruitTales Guardian.
+- Estructura, características y configuración documentadas con las funciones reales del bot y la ubicación segura de sus secretos.
+
 ## [2026-09-08] - Ampliación de FruitTales Guardian
 
 ### Añadido

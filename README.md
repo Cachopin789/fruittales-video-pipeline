@@ -26,7 +26,7 @@ Pipeline de post-producción de vídeo para preparar Shorts y vídeos largos a p
 
 FruitTales Video Pipeline se encarga de la post-producción técnica de partes de vídeo ya creadas para las historias de FruitTales. No genera guiones ni contenido narrativo: compila las partes indicadas, las ordena, normaliza su formato, aplica una marca propia y prepara el resultado final para revisión antes de publicar.
 
-El proyecto no requiere dependencias de Python ni API keys: funciona con PowerShell, FFmpeg y `ffprobe`.
+El pipeline de vídeo funciona de forma independiente con PowerShell, FFmpeg y `ffprobe`; no requiere Python ni API keys. El bot de Discord, ubicado en `bot/`, es un componente separado que sí utiliza Python y necesita un token de Discord y una API key de YouTube configurados mediante `.env`.
 
 <a id="caracteristicas"></a>
 ## ✨ Características
@@ -36,7 +36,7 @@ El proyecto no requiere dependencias de Python ni API keys: funciona con PowerSh
 - 💧 Añade una marca de agua mediante texto configurable o un PNG transparente.
 - ✍️ Prepara flujos de publicación con títulos, descripciones, hashtags y prompts de miniatura para usar con IA.
 - 🔊 Conserva el audio original y permite aplicar ajustes orientados a reducir riesgos de reclamaciones, siempre respetando los derechos del contenido.
-- 🤖 Incluye un bot de Discord independiente en `bot/`, con avisos de nuevos vídeos de YouTube y comandos de estadísticas.
+- 🤖 Incluye FruitTales Guardian, un bot de Discord independiente en `bot/` con avisos programados de nuevos vídeos, estadísticas, recomendaciones, calendario de publicaciones y comandos de estado.
 
 <a id="requisitos"></a>
 ## 📋 Requisitos
@@ -139,6 +139,8 @@ Para retomar el proceso desde un lote específico:
 
 `config.psd1` controla el aspecto y la codificación de salida. No contiene API keys ni datos personales.
 
+La configuración privada del bot se guarda por separado en `bot/.env` y nunca debe subirse al repositorio.
+
 - `MarcaTexto`: texto usado si no existe `assets/marca.png`.
 - `OpacidadMarca`, `MargenPx` y `EscalaLogoPx`: tamaño y posición de la marca.
 - `CalidadCrf` y `Preset`: equilibrio entre calidad, peso y tiempo de codificación.
@@ -161,6 +163,10 @@ Para retomar el proceso desde un lote específico:
 │   ├── Procesar-Short.ps1           # Genera Shorts verticales
 │   ├── Crear-VideoLargo.ps1         # Normaliza y une episodios
 │   └── Crear-Lote-Largos.ps1        # Crea lotes de vídeos largos
+├── bot/                              # FruitTales Guardian, independiente del pipeline
+│   ├── main.py                       # Punto de entrada del bot de Discord
+│   ├── README.md                     # Instalación, comandos y despliegue
+│   └── comandos-docs/                # Documentación individual de comandos
 └── plantillas/
     └── ficha-publicacion.md         # Plantilla de publicación y metadatos
 ```
