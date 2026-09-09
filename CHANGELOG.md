@@ -2,6 +2,14 @@
 
 Todos los cambios relevantes de FruitTales se documentan en este archivo.
 
+## [2026-09-09] - Validaciones finales del bot
+
+### Corregido
+
+- `/encuesta` rechaza opciones vacías y exige al menos dos alternativas válidas.
+- `/sugerir` vuelve de forma segura al canal público si el canal opcional configurado ya no existe.
+- Los errores de configuración de IDs y los registros de errores de comandos son más claros para el diagnóstico.
+
 ## [2026-09-09] - Funciones de comunidad
 
 ### Añadido

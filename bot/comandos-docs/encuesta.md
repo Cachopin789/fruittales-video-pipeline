@@ -6,4 +6,4 @@
 
 **Ejemplo:** un embed con `1️⃣ Fresa`, `2️⃣ Plátano` y `3️⃣ Manzana`.
 
-**Limitaciones:** solo puede usarlo el propietario o una persona con permiso de gestionar el servidor. El bot necesita permiso para añadir reacciones; no consume cuota de YouTube.
+**Limitaciones:** exige al menos dos opciones. Solo puede usarlo el propietario o una persona con permiso de gestionar el servidor. El bot necesita permiso para añadir reacciones; no consume cuota de YouTube.

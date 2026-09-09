@@ -135,8 +135,11 @@ async def sugerir(interaction: discord.Interaction, idea: str):
         return
     channel = None
     if settings.suggestions_channel_id:
-        candidate = bot.get_channel(settings.suggestions_channel_id) or await bot.fetch_channel(settings.suggestions_channel_id)
-        if isinstance(candidate, discord.TextChannel): channel = candidate
+        try:
+            candidate = bot.get_channel(settings.suggestions_channel_id) or await bot.fetch_channel(settings.suggestions_channel_id)
+            if isinstance(candidate, discord.TextChannel): channel = candidate
+        except discord.DiscordException as error:
+            logger.warning("SUGGESTIONS_CHANNEL_ID no está disponible: %s", error)
     channel = channel or find_text_channel(interaction.guild, "💡│sugerencias", "sugerencias")
     if channel is None:
         await interaction.response.send_message("⚠️ No encuentro el canal de sugerencias. Ejecuta `/configurar-servidor` o configura `SUGGESTIONS_CHANNEL_ID`.", ephemeral=True)
@@ -156,8 +159,8 @@ async def encuesta(interaction: discord.Interaction, pregunta: str, opcion_1: st
         await interaction.response.send_message("🔒 Solo el propietario o el equipo de moderación puede crear encuestas.", ephemeral=True)
         return
     options = [option.strip() for option in (opcion_1, opcion_2, opcion_3, opcion_4) if option and option.strip()]
-    if len(pregunta.strip()) < 5 or len(pregunta) > 256 or any(len(option) > 150 for option in options):
-        await interaction.response.send_message("⚠️ Revisa la pregunta y las opciones: usa textos breves y claros.", ephemeral=True)
+    if len(pregunta.strip()) < 5 or len(pregunta) > 256 or len(options) < 2 or any(len(option) > 150 for option in options):
+        await interaction.response.send_message("⚠️ Incluye al menos dos opciones y usa textos breves y claros.", ephemeral=True)
         return
     await interaction.response.send_message(embed=poll_embed(pregunta.strip(), options, interaction.user))
     message = await interaction.original_response()
@@ -249,7 +252,7 @@ async def stats(interaction: discord.Interaction):
     except YouTubeAPIError as error: await interaction.followup.send(f"⚠️ No pude consultar YouTube ahora mismo: {error}", ephemeral=True)
 @bot.tree.error
 async def command_error(interaction: discord.Interaction, error):
-    logger.exception("Error ejecutando un comando: %s", error)
+    logger.error("Error ejecutando un comando: %s", error, exc_info=(type(error), error, error.__traceback__))
     text = "⚠️ Ha ocurrido un error temporal. Inténtalo de nuevo en unos segundos."
     if interaction.response.is_done(): await interaction.followup.send(text, ephemeral=True)
     else: await interaction.response.send_message(text, ephemeral=True)

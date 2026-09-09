@@ -6,4 +6,4 @@
 
 **Ejemplo:** `/sugerir idea:Me gustaría una historia sobre una naranja exploradora.`
 
-**Limitaciones:** acepta entre 5 y 1.000 caracteres. Usa `💡│sugerencias` o el canal privado indicado con `SUGGESTIONS_CHANNEL_ID`; no consume cuota de YouTube.
+**Limitaciones:** acepta entre 5 y 1.000 caracteres. Usa `💡│sugerencias` o el canal privado indicado con `SUGGESTIONS_CHANNEL_ID`; si ese canal ya no existe, vuelve al canal público. No consume cuota de YouTube.

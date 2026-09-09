@@ -35,4 +35,4 @@ def load_settings() -> Settings:
             os.getenv("NEXT_VIDEO_URL") or None, int(suggestion_channel) if suggestion_channel else None,
         )
     except ValueError as error:
-        raise RuntimeError("DISCORD_CHANNEL_ID y CHECK_INTERVAL_MINUTES deben ser numeros.") from error
+        raise RuntimeError("DISCORD_CHANNEL_ID, OWNER_USER_ID, SUGGESTIONS_CHANNEL_ID y CHECK_INTERVAL_MINUTES deben contener números válidos.") from error
