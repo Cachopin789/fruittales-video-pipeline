@@ -17,6 +17,12 @@
 | `/encuesta` | Crea una votación con reacciones para la comunidad. |
 | `/normas` | Da acceso rápido al canal de reglas. |
 | `/configurar-servidor` | Crea una estructura profesional de canales y roles una sola vez. |
+| `/crear-canal` | Crea un canal de texto o voz con formato consistente (solo propietario). |
+| `/crear-rol` | Crea un rol con un color definido (solo propietario). |
+| `/ajustes ver` | Muestra la configuración actual sin revelar secretos (solo propietario). |
+| `/ajustes cambiar-horario` | Cambia la franja de comprobación de YouTube (solo propietario). |
+| `/ajustes cambiar-canal-avisos` | Cambia el destino de los avisos sin editar código (solo propietario). |
+| `/crear-invitacion` | Genera un enlace temporal de invitación (solo propietario). |
 | `/ping` y `/uptime` | Comprueban latencia y tiempo en línea. |
 
 Hay una explicación y ejemplo de cada comando en [`comandos-docs/`](comandos-docs/).
@@ -31,7 +37,7 @@ El monitor usa siempre la hora local de España (`Europe/Madrid`):
 - Entre **21:00 y 15:00 del día siguiente**, no consulta la API de YouTube ni envía avisos.
 - Aunque `CHECK_INTERVAL_MINUTES` tuviera un valor menor en `.env`, el bot lo limita automáticamente a 30 minutos para proteger la cuota.
 
-Los comandos manuales siguen disponibles mientras el bot esté conectado. En su primer inicio guarda el último vídeo sin anunciarlo para no publicar una alerta antigua.
+Los comandos manuales siguen disponibles mientras el bot esté conectado. En su primer inicio guarda el último vídeo sin anunciarlo para no publicar una alerta antigua. El horario y el canal de avisos se conservan en `config_bot.json`; no contiene secretos y se crea automáticamente al usar `/ajustes`.
 
 ## Ejecutarlo en tu PC
 
@@ -76,10 +82,16 @@ NEXT_VIDEO_URL=https://www.youtube.com/@FruitTalesES
 1. Da al bot el permiso **Administrador** y asegúrate de que su rol esté por encima de los roles que debe gestionar.
 2. Comprueba que `OWNER_USER_ID` contiene tu ID numérico de Discord.
 3. En tu servidor, ejecuta `/configurar-servidor` una sola vez.
-4. El bot creará, sin duplicar lo existente, las categorías `📢 INFORMACIÓN`, `🎬 CONTENIDO`, `💬 COMUNIDAD` y `🎙️ VOZ`; sus canales con emojis, la sala `🔊 Sala general` y los roles `Admin` y `Miembro`. Si detecta canales antiguos sin emoji, los renombrará y ordenará automáticamente.
+4. El bot creará, sin duplicar lo existente, las categorías `📢 INFORMACIÓN`, `🎬 CONTENIDO`, `💬 COMUNIDAD`, `🎙️ VOZ` y `🤖 BOTS`; sus canales con emojis, `🤖│bot-comandos`, la sala `🔊 Sala general` y los roles `Admin`, `Miembro` y `Bots`. Si detecta canales antiguos sin emoji, los renombrará y ordenará automáticamente.
 5. `#nuevos-videos` queda vinculado automáticamente como canal de avisos. El bot conserva ese ajuste localmente; `DISCORD_CHANNEL_ID` sigue siendo el canal de respaldo definido en `.env`.
 
-El comando es privado y solo responde al usuario configurado en `OWNER_USER_ID`. Las personas que se unan después recibirán automáticamente el rol `Miembro`.
+`💬│general` y `🔔│nuevos-videos` son públicos. Los demás canales quedan ocultos para `@everyone` y disponibles para ti y los bots. Discord no tiene un permiso automático para todo bot futuro: da el rol `Bots` (o Administrador) a cada bot que añadas. El comando y los nuevos comandos de gestión solo responden al usuario configurado en `OWNER_USER_ID`. Las personas que se unan después recibirán automáticamente el rol `Miembro`.
+
+## ⚙️ Gestionar el bot sin editar código
+
+Usa `/ajustes ver` para consultar de forma privada el intervalo, el horario y el canal de avisos. Con `/ajustes cambiar-horario` y `/ajustes cambiar-canal-avisos` puedes cambiar los valores mientras el bot está conectado; se guardan en `bot/config_bot.json` y sobreviven a reinicios. El archivo no guarda tokens ni API keys, está ignorado por Git y tiene una plantilla en [`config_bot.example.json`](config_bot.example.json).
+
+Para ampliar el servidor, usa `/crear-canal`, `/crear-rol` y `/crear-invitacion`. Todos son exclusivos de `OWNER_USER_ID`, responden de forma privada y requieren que el bot tenga los permisos correspondientes.
 
 ## API de YouTube
 

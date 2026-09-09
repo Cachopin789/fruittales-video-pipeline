@@ -42,6 +42,7 @@ def help_embed() -> discord.Embed:
     embed.add_field(name="📺 Canal", value="`/canal` · información general\n`/stats` · estadísticas actuales\n`/ultimovideo` · último vídeo\n`/random` · recomendación aleatoria", inline=False)
     embed.add_field(name="🔔 Seguimiento", value="`/proximo` · próxima publicación anunciada\n`/estado` · estado del monitor y horario", inline=False)
     embed.add_field(name="💬 Comunidad", value="`/sugerir` · propone una idea\n`/encuesta` · crea una votación\n`/normas` · consulta las reglas", inline=False)
-    embed.add_field(name="🛠️ Bot", value="`/ping` · latencia\n`/uptime` · tiempo en línea\n`/ayuda` · esta guía\n`/configurar-servidor` · estructura inicial (solo propietario)", inline=False)
+    embed.add_field(name="🛠️ Bot", value="`/ping` · latencia\n`/uptime` · tiempo en línea\n`/ayuda` · esta guía", inline=False)
+    embed.add_field(name="🔒 Gestión (solo propietario)", value="`/configurar-servidor` · estructura y privacidad\n`/crear-canal` · canal de texto o voz\n`/crear-rol` · rol con color\n`/ajustes ver` · configuración actual\n`/ajustes cambiar-horario` · franja de avisos\n`/ajustes cambiar-canal-avisos` · destino de avisos\n`/crear-invitacion` · enlace temporal", inline=False)
     embed.set_footer(text="Los avisos automáticos se envían entre 15:00 y 21:00, hora de España.")
     return embed

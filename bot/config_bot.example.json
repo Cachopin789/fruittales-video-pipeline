@@ -1,0 +1,6 @@
+{
+  "check_interval_minutes": 30,
+  "notification_start": "15:00",
+  "notification_end": "21:00",
+  "notification_channel_id": null
+}

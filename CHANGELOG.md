@@ -2,6 +2,19 @@
 
 Todos los cambios relevantes de FruitTales se documentan en este archivo.
 
+## [2026-09-09] - Gestión persistente y privacidad del servidor
+
+### Añadido
+
+- Comandos exclusivos del propietario `/crear-canal`, `/crear-rol`, `/ajustes ver`, `/ajustes cambiar-horario`, `/ajustes cambiar-canal-avisos` y `/crear-invitacion`.
+- Configuración local persistente en `bot/config_bot.json` para el horario, intervalo y canal de avisos, sin almacenar secretos.
+- Categoría privada `🤖 BOTS`, canal `🤖│bot-comandos` y rol `Bots` para dar acceso controlado a FruitTales Guardian y a futuros bots.
+
+### Mejorado
+
+- `/configurar-servidor` reaplica permisos de forma idempotente: `💬│general` y `🔔│nuevos-videos` son públicos; el resto de canales queda oculto para `@everyone` y disponible para el propietario y el rol `Bots`.
+- Documentación de configuración, privacidad y comandos de gestión ampliada.
+
 ## [2026-09-09] - Corrección de permisos en la configuración del servidor
 
 ### Corregido
