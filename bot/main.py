@@ -10,6 +10,7 @@ from embeds import channel_embed, help_embed, stats_embed, video_embed
 from logging_setup import configure_logging
 from programacion import next_scheduled_video
 from schedule import is_due, is_notification_window, madrid_now
+from server_setup import configure_server
 from state import last_check, read, save
 from youtube import YouTubeAPIError, YouTubeClient
 
@@ -29,7 +30,9 @@ async def retry(operation, label: str, attempts: int = 3):
 
 class FruitTalesBot(commands.Bot):
     def __init__(self):
-        super().__init__(command_prefix="!", intents=discord.Intents.default())
+        intents = discord.Intents.default()
+        intents.members = True  # Necesario para asignar el rol Miembro al entrar al servidor.
+        super().__init__(command_prefix="!", intents=intents)
         self.youtube = YouTubeClient(settings.youtube_api_key, settings.youtube_channel_handle)
         self.started_at = monotonic()
     async def setup_hook(self):
@@ -40,6 +43,16 @@ class FruitTalesBot(commands.Bot):
     async def on_disconnect(self): logger.warning("Discord desconectado; se intentará reconectar automáticamente.")
     async def on_app_command_completion(self, interaction, command):
         logger.info("Comando /%s usado por %s en servidor %s.", command.qualified_name, interaction.user.id, interaction.guild_id)
+    async def on_member_join(self, member: discord.Member):
+        """Da el rol de comunidad a miembros nuevos cuando el intent está habilitado."""
+        role = discord.utils.get(member.guild.roles, name="Miembro")
+        if role is None:
+            return
+        try:
+            await member.add_roles(role, reason="Rol automático de bienvenida de FruitTales Guardian")
+            logger.info("Rol Miembro asignado a %s.", member.id)
+        except discord.DiscordException as error:
+            logger.warning("No se pudo asignar Miembro a %s: %s", member.id, error)
     @tasks.loop(minutes=1)
     async def check_videos(self):
         """No consulta YouTube fuera de 15:00–21:00 (Europe/Madrid)."""
@@ -68,6 +81,34 @@ class FruitTalesBot(commands.Bot):
     async def before_check_videos(self): await self.wait_until_ready()
 
 bot = FruitTalesBot()
+@bot.tree.command(name="configurar-servidor", description="Crea la estructura inicial del servidor FruitTales.")
+async def configurar_servidor(interaction: discord.Interaction):
+    """Comando de una sola persona: crea roles, categorías y canales sin duplicarlos."""
+    if interaction.user.id != settings.owner_user_id:
+        await interaction.response.send_message("🔒 Este comando está reservado para el propietario de FruitTales Guardian.", ephemeral=True)
+        logger.warning("Intento no autorizado de /configurar-servidor por %s.", interaction.user.id)
+        return
+    if interaction.guild is None:
+        await interaction.response.send_message("⚠️ Este comando solo se puede usar dentro de un servidor.", ephemeral=True)
+        return
+    if not interaction.guild.me or not interaction.guild.me.guild_permissions.administrator:
+        await interaction.response.send_message("⚠️ Necesito el permiso **Administrador** para crear la estructura del servidor.", ephemeral=True)
+        return
+    await interaction.response.defer(ephemeral=True, thinking=True)
+    try:
+        result = await configure_server(interaction.guild, interaction.guild.me)
+        embed = discord.Embed(title="🍊 Servidor FruitTales configurado", color=0x2ECC71)
+        embed.add_field(name="✅ Creados", value="\n".join(result.created) if result.created else "Nada: todo ya existía.", inline=False)
+        embed.add_field(name="♻️ Ya existentes", value="\n".join(result.existing) if result.existing else "Ninguno.", inline=False)
+        embed.add_field(name="🔔 Canal de avisos", value=f"<#{result.videos_channel_id}>", inline=False)
+        embed.set_footer(text="Añade este ID a DISCORD_CHANNEL_ID si aún no está configurado.")
+        await interaction.followup.send(embed=embed, ephemeral=True)
+        logger.info("Servidor %s configurado por el propietario.", interaction.guild.id)
+    except discord.Forbidden:
+        await interaction.followup.send("⚠️ Discord rechazó una acción. Revisa que mi rol esté por encima de los roles que debo gestionar.", ephemeral=True)
+    except discord.DiscordException as error:
+        logger.error("No se pudo configurar el servidor: %s", error)
+        await interaction.followup.send("⚠️ No pude terminar la configuración. Revisa los permisos del bot e inténtalo de nuevo.", ephemeral=True)
 @bot.tree.command(name="ping", description="Comprueba la latencia actual del bot.")
 async def ping(interaction: discord.Interaction):
     await interaction.response.send_message(f"🏓 Pong · Latencia: **{round(bot.latency * 1000)} ms**", ephemeral=True)

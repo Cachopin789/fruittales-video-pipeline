@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 class Settings:
     discord_token: str
     youtube_api_key: str
+    owner_user_id: int
     discord_channel_id: int
     youtube_channel_handle: str
     check_interval_minutes: int
@@ -16,7 +17,7 @@ class Settings:
 
 def load_settings() -> Settings:
     load_dotenv()
-    missing = [key for key in ("DISCORD_TOKEN", "YOUTUBE_API_KEY", "DISCORD_CHANNEL_ID") if not os.getenv(key)]
+    missing = [key for key in ("DISCORD_TOKEN", "YOUTUBE_API_KEY", "DISCORD_CHANNEL_ID", "OWNER_USER_ID") if not os.getenv(key)]
     if missing:
         raise RuntimeError("Faltan valores en .env: " + ", ".join(missing))
     try:
@@ -24,7 +25,7 @@ def load_settings() -> Settings:
         # El requisito del proyecto prohíbe consultas más frecuentes de 30 minutos.
         safe_interval = max(30, requested_interval)
         return Settings(
-            os.environ["DISCORD_TOKEN"], os.environ["YOUTUBE_API_KEY"],
+            os.environ["DISCORD_TOKEN"], os.environ["YOUTUBE_API_KEY"], int(os.environ["OWNER_USER_ID"]),
             int(os.environ["DISCORD_CHANNEL_ID"]), os.getenv("YOUTUBE_CHANNEL_HANDLE", "FruitTalesES").lstrip("@"),
             safe_interval, os.getenv("NEXT_VIDEO_AT") or None, os.getenv("NEXT_VIDEO_TITLE") or None,
             os.getenv("NEXT_VIDEO_URL") or None,

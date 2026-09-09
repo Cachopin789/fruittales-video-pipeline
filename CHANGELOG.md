@@ -2,6 +2,15 @@
 
 Todos los cambios relevantes de FruitTales se documentan en este archivo.
 
+## [2026-09-09] - Configuración inicial del servidor Discord
+
+### Añadido
+
+- Comando exclusivo `/configurar-servidor`, protegido por `OWNER_USER_ID`, para crear la estructura profesional del servidor sin duplicar roles ni canales.
+- Creación idempotente de categorías, canales, sala de voz y roles `Admin` y `Miembro`, con permisos de solo lectura en `#anuncios` para la comunidad.
+- Asignación automática del rol `Miembro` a nuevas entradas cuando Server Members Intent está habilitado.
+- Documentación del comando, permisos necesarios y configuración segura del propietario.
+
 ## [2026-09-09] - Aclaración de documentación del proyecto
 
 ### Corregido
