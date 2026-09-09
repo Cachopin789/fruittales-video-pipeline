@@ -2,6 +2,13 @@
 
 Todos los cambios relevantes de FruitTales se documentan en este archivo.
 
+## [2026-09-09] - Corrección de permisos en la configuración del servidor
+
+### Corregido
+
+- `/configurar-servidor` deja de enviar `overwrites=None` a discord.py al crear canales sin permisos personalizados, evitando el fallo al crear `📜│reglas` y los demás canales normales.
+- Las opciones de migración y permisos se pasan ahora por nombre, evitando asignaciones posicionales incorrectas y manteniendo la ejecución idempotente tras una interrupción.
+
 ## [2026-09-09] - Validaciones finales del bot
 
 ### Corregido

@@ -18,7 +18,7 @@ async def _category(guild: discord.Guild, name: str, result: SetupResult) -> dis
     result.created.append(name)
     return channel
 
-async def _text_channel(guild: discord.Guild, category: discord.CategoryChannel, name: str, result: SetupResult, legacy_names: tuple[str, ...] = (), overwrites=None) -> discord.TextChannel:
+async def _text_channel(guild: discord.Guild, category: discord.CategoryChannel, name: str, result: SetupResult, *, legacy_names: tuple[str, ...] = (), overwrites: dict | None = None) -> discord.TextChannel:
     found = discord.utils.get(guild.text_channels, name=name)
     legacy_name = None
     if found is None:
@@ -39,11 +39,15 @@ async def _text_channel(guild: discord.Guild, category: discord.CategoryChannel,
         else:
             result.existing.append(f"#{name}")
         return found
-    channel = await guild.create_text_channel(name, category=category, overwrites=overwrites, reason="Configuración inicial de FruitTales Guardian")
+    create_options = {"category": category, "reason": "Configuración inicial de FruitTales Guardian"}
+    # discord.py solo acepta overwrites cuando recibe un diccionario, nunca None.
+    if overwrites is not None:
+        create_options["overwrites"] = overwrites
+    channel = await guild.create_text_channel(name, **create_options)
     result.created.append(f"#{name}")
     return channel
 
-async def _voice_channel(guild: discord.Guild, category: discord.CategoryChannel, name: str, result: SetupResult, legacy_names: tuple[str, ...] = ()) -> discord.VoiceChannel:
+async def _voice_channel(guild: discord.Guild, category: discord.CategoryChannel, name: str, result: SetupResult, *, legacy_names: tuple[str, ...] = ()) -> discord.VoiceChannel:
     found = discord.utils.get(guild.voice_channels, name=name)
     legacy_name = None
     if found is None:
@@ -93,13 +97,13 @@ async def configure_server(guild: discord.Guild, bot_member: discord.Member) -> 
         admin_role: discord.PermissionOverwrite(view_channel=True, send_messages=True),
         bot_member: discord.PermissionOverwrite(view_channel=True, send_messages=True),
     }
-    await _text_channel(guild, information, "📌│anuncios", result, ("anuncios",), announcement_overwrites)
-    await _text_channel(guild, information, "📜│reglas", result, ("reglas",))
-    await _text_channel(guild, information, "🔗│enlaces-canal", result, ("enlaces-canal",))
-    videos = await _text_channel(guild, content, "🔔│nuevos-videos", result, ("nuevos-videos",))
-    await _text_channel(guild, content, "💡│sugerencias", result, ("sugerencias",))
-    await _text_channel(guild, community, "💬│general", result, ("general",))
-    await _text_channel(guild, community, "🍊│memes-frutales", result, ("memes-frutales",))
-    await _voice_channel(guild, voice, "🔊 Sala general", result, ("Sala general",))
+    await _text_channel(guild, information, "📌│anuncios", result, legacy_names=("anuncios",), overwrites=announcement_overwrites)
+    await _text_channel(guild, information, "📜│reglas", result, legacy_names=("reglas",))
+    await _text_channel(guild, information, "🔗│enlaces-canal", result, legacy_names=("enlaces-canal",))
+    videos = await _text_channel(guild, content, "🔔│nuevos-videos", result, legacy_names=("nuevos-videos",))
+    await _text_channel(guild, content, "💡│sugerencias", result, legacy_names=("sugerencias",))
+    await _text_channel(guild, community, "💬│general", result, legacy_names=("general",))
+    await _text_channel(guild, community, "🍊│memes-frutales", result, legacy_names=("memes-frutales",))
+    await _voice_channel(guild, voice, "🔊 Sala general", result, legacy_names=("Sala general",))
     result.videos_channel_id = videos.id
     return result
