@@ -72,7 +72,7 @@ NEXT_VIDEO_URL=https://www.youtube.com/@FruitTalesES
 2. Comprueba que `OWNER_USER_ID` contiene tu ID numérico de Discord.
 3. En tu servidor, ejecuta `/configurar-servidor` una sola vez.
 4. El bot creará, sin duplicar lo existente, las categorías `📢 INFORMACIÓN`, `🎬 CONTENIDO`, `💬 COMUNIDAD` y `🎙️ VOZ`; sus canales, la sala de voz y los roles `Admin` y `Miembro`.
-5. Copia el ID de `#nuevos-videos` mostrado en la confirmación y úsalo como `DISCORD_CHANNEL_ID` en `.env` si todavía no estaba configurado. Reinicia el bot después de cambiarlo.
+5. `#nuevos-videos` queda vinculado automáticamente como canal de avisos. El bot conserva ese ajuste localmente; `DISCORD_CHANNEL_ID` sigue siendo el canal de respaldo definido en `.env`.
 
 El comando es privado y solo responde al usuario configurado en `OWNER_USER_ID`. Las personas que se unan después recibirán automáticamente el rol `Miembro`.
 

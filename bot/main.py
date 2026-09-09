@@ -11,7 +11,7 @@ from logging_setup import configure_logging
 from programacion import next_scheduled_video
 from schedule import is_due, is_notification_window, madrid_now
 from server_setup import configure_server
-from state import last_check, read, save
+from state import last_check, notification_channel_id, read, save
 from youtube import YouTubeAPIError, YouTubeClient
 
 configure_logging()
@@ -32,7 +32,8 @@ class FruitTalesBot(commands.Bot):
     def __init__(self):
         intents = discord.Intents.default()
         intents.members = True  # Necesario para asignar el rol Miembro al entrar al servidor.
-        super().__init__(command_prefix="!", intents=intents)
+        # Solo usamos slash commands: evita pedir Message Content Intent innecesariamente.
+        super().__init__(command_prefix=commands.when_mentioned, intents=intents, allowed_mentions=discord.AllowedMentions.none())
         self.youtube = YouTubeClient(settings.youtube_api_key, settings.youtube_channel_handle)
         self.started_at = monotonic()
     async def setup_hook(self):
@@ -68,7 +69,8 @@ class FruitTalesBot(commands.Bot):
             if previous_id == video.video_id:
                 logger.info("No hay vídeo nuevo."); return
             async def send_notification():
-                channel = self.get_channel(settings.discord_channel_id) or await self.fetch_channel(settings.discord_channel_id)
+                channel_id = notification_channel_id() or settings.discord_channel_id
+                channel = self.get_channel(channel_id) or await self.fetch_channel(channel_id)
                 if not isinstance(channel, (discord.TextChannel, discord.Thread)):
                     raise discord.DiscordException("DISCORD_CHANNEL_ID no es un canal de texto.")
                 await channel.send(embed=video_embed(video), allowed_mentions=discord.AllowedMentions.none())
@@ -97,11 +99,12 @@ async def configurar_servidor(interaction: discord.Interaction):
     await interaction.response.defer(ephemeral=True, thinking=True)
     try:
         result = await configure_server(interaction.guild, interaction.guild.me)
+        save(notification_channel=result.videos_channel_id)
         embed = discord.Embed(title="🍊 Servidor FruitTales configurado", color=0x2ECC71)
         embed.add_field(name="✅ Creados", value="\n".join(result.created) if result.created else "Nada: todo ya existía.", inline=False)
         embed.add_field(name="♻️ Ya existentes", value="\n".join(result.existing) if result.existing else "Ninguno.", inline=False)
         embed.add_field(name="🔔 Canal de avisos", value=f"<#{result.videos_channel_id}>", inline=False)
-        embed.set_footer(text="Añade este ID a DISCORD_CHANNEL_ID si aún no está configurado.")
+        embed.set_footer(text="Este canal ya queda configurado para los avisos automáticos.")
         await interaction.followup.send(embed=embed, ephemeral=True)
         logger.info("Servidor %s configurado por el propietario.", interaction.guild.id)
     except discord.Forbidden:

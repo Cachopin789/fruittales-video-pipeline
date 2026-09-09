@@ -2,6 +2,14 @@
 
 Todos los cambios relevantes de FruitTales se documentan en este archivo.
 
+## [2026-09-09] - Correcciones de fiabilidad del bot
+
+### Corregido
+
+- `/configurar-servidor` guarda automáticamente `#nuevos-videos` como destino de los avisos, con `DISCORD_CHANNEL_ID` como respaldo.
+- El bot ya no solicita Message Content Intent, que no necesita al funcionar exclusivamente con comandos `/`.
+- Protección global contra menciones accidentales en los mensajes enviados por el bot.
+
 ## [2026-09-09] - Arranque local robusto del bot
 
 ### Corregido
