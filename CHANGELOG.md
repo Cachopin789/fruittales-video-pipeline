@@ -2,6 +2,14 @@
 
 Todos los cambios relevantes de FruitTales se documentan en este archivo.
 
+## [2026-09-09] - Estructura visual del servidor Discord
+
+### Mejorado
+
+- `/configurar-servidor` crea canales y sala de voz con emojis para una estructura visual consistente.
+- Los canales antiguos sin emoji se renombran y reubican automáticamente, sin crear duplicados.
+- El resumen de configuración diferencia elementos creados, migrados y ya existentes.
+
 ## [2026-09-09] - Correcciones de fiabilidad del bot
 
 ### Corregido

@@ -6,6 +6,7 @@ import discord
 class SetupResult:
     created: list[str]
     existing: list[str]
+    migrated: list[str]
     videos_channel_id: int
 
 async def _category(guild: discord.Guild, name: str, result: SetupResult) -> discord.CategoryChannel:
@@ -17,21 +18,50 @@ async def _category(guild: discord.Guild, name: str, result: SetupResult) -> dis
     result.created.append(name)
     return channel
 
-async def _text_channel(guild: discord.Guild, category: discord.CategoryChannel, name: str, result: SetupResult, overwrites=None) -> discord.TextChannel:
+async def _text_channel(guild: discord.Guild, category: discord.CategoryChannel, name: str, result: SetupResult, legacy_names: tuple[str, ...] = (), overwrites=None) -> discord.TextChannel:
     found = discord.utils.get(guild.text_channels, name=name)
+    legacy_name = None
+    if found is None:
+        for old_name in legacy_names:
+            found = discord.utils.get(guild.text_channels, name=old_name)
+            if found:
+                legacy_name = old_name
+                break
     if found:
-        if overwrites is not None:
-            await found.edit(overwrites=overwrites, reason="Ajuste de permisos de FruitTales Guardian")
-        result.existing.append(f"#{name}")
+        changes = {}
+        if legacy_name: changes["name"] = name
+        if found.category_id != category.id: changes["category"] = category
+        if overwrites is not None: changes["overwrites"] = overwrites
+        if changes:
+            await found.edit(**changes, reason="Migración de estructura de FruitTales Guardian")
+        if legacy_name:
+            result.migrated.append(f"#{legacy_name} → #{name}")
+        else:
+            result.existing.append(f"#{name}")
         return found
     channel = await guild.create_text_channel(name, category=category, overwrites=overwrites, reason="Configuración inicial de FruitTales Guardian")
     result.created.append(f"#{name}")
     return channel
 
-async def _voice_channel(guild: discord.Guild, category: discord.CategoryChannel, name: str, result: SetupResult) -> discord.VoiceChannel:
+async def _voice_channel(guild: discord.Guild, category: discord.CategoryChannel, name: str, result: SetupResult, legacy_names: tuple[str, ...] = ()) -> discord.VoiceChannel:
     found = discord.utils.get(guild.voice_channels, name=name)
+    legacy_name = None
+    if found is None:
+        for old_name in legacy_names:
+            found = discord.utils.get(guild.voice_channels, name=old_name)
+            if found:
+                legacy_name = old_name
+                break
     if found:
-        result.existing.append(f"🔊 {name}")
+        changes = {}
+        if legacy_name: changes["name"] = name
+        if found.category_id != category.id: changes["category"] = category
+        if changes:
+            await found.edit(**changes, reason="Migración de estructura de FruitTales Guardian")
+        if legacy_name:
+            result.migrated.append(f"🔊 {legacy_name} → {name}")
+        else:
+            result.existing.append(f"🔊 {name}")
         return found
     channel = await guild.create_voice_channel(name, category=category, reason="Configuración inicial de FruitTales Guardian")
     result.created.append(f"🔊 {name}")
@@ -48,7 +78,7 @@ async def _role(guild: discord.Guild, name: str, colour: discord.Colour, result:
 
 async def configure_server(guild: discord.Guild, bot_member: discord.Member) -> SetupResult:
     """Crea solo los elementos ausentes y devuelve un resumen para el propietario."""
-    result = SetupResult([], [], 0)
+    result = SetupResult([], [], [], 0)
     admin_role = await _role(guild, "Admin", discord.Colour.red(), result)
     await _role(guild, "Miembro", discord.Colour.green(), result)
 
@@ -63,13 +93,13 @@ async def configure_server(guild: discord.Guild, bot_member: discord.Member) -> 
         admin_role: discord.PermissionOverwrite(view_channel=True, send_messages=True),
         bot_member: discord.PermissionOverwrite(view_channel=True, send_messages=True),
     }
-    await _text_channel(guild, information, "anuncios", result, announcement_overwrites)
-    await _text_channel(guild, information, "reglas", result)
-    await _text_channel(guild, information, "enlaces-canal", result)
-    videos = await _text_channel(guild, content, "nuevos-videos", result)
-    await _text_channel(guild, content, "sugerencias", result)
-    await _text_channel(guild, community, "general", result)
-    await _text_channel(guild, community, "memes-frutales", result)
-    await _voice_channel(guild, voice, "Sala general", result)
+    await _text_channel(guild, information, "📌│anuncios", result, ("anuncios",), announcement_overwrites)
+    await _text_channel(guild, information, "📜│reglas", result, ("reglas",))
+    await _text_channel(guild, information, "🔗│enlaces-canal", result, ("enlaces-canal",))
+    videos = await _text_channel(guild, content, "🔔│nuevos-videos", result, ("nuevos-videos",))
+    await _text_channel(guild, content, "💡│sugerencias", result, ("sugerencias",))
+    await _text_channel(guild, community, "💬│general", result, ("general",))
+    await _text_channel(guild, community, "🍊│memes-frutales", result, ("memes-frutales",))
+    await _voice_channel(guild, voice, "🔊 Sala general", result, ("Sala general",))
     result.videos_channel_id = videos.id
     return result

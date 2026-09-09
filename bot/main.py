@@ -102,6 +102,7 @@ async def configurar_servidor(interaction: discord.Interaction):
         save(notification_channel=result.videos_channel_id)
         embed = discord.Embed(title="🍊 Servidor FruitTales configurado", color=0x2ECC71)
         embed.add_field(name="✅ Creados", value="\n".join(result.created) if result.created else "Nada: todo ya existía.", inline=False)
+        embed.add_field(name="✨ Migrados", value="\n".join(result.migrated) if result.migrated else "Ninguno.", inline=False)
         embed.add_field(name="♻️ Ya existentes", value="\n".join(result.existing) if result.existing else "Ninguno.", inline=False)
         embed.add_field(name="🔔 Canal de avisos", value=f"<#{result.videos_channel_id}>", inline=False)
         embed.set_footer(text="Este canal ya queda configurado para los avisos automáticos.")
