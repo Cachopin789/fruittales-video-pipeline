@@ -39,6 +39,8 @@ pip install -r requirements.txt
 python main.py
 ```
 
+Si el entorno virtual está en la raíz del repositorio, también puedes iniciarlo desde allí con `\.venv\Scripts\python.exe bot\main.py`. El bot localiza siempre su archivo `bot/.env`.
+
 Completa antes `bot/.env` y guárdalo. Nunca compartas el token o la API key ni subas `.env` a GitHub.
 
 Para proteger el comando de configuración inicial, añade tu ID numérico de Discord:

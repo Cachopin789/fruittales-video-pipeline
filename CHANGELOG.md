@@ -2,6 +2,12 @@
 
 Todos los cambios relevantes de FruitTales se documentan en este archivo.
 
+## [2026-09-09] - Arranque local robusto del bot
+
+### Corregido
+
+- La carga de `bot/.env` ya no depende de la carpeta desde la que se ejecute Python; el bot puede iniciarse correctamente desde la raíz del repositorio.
+
 ## [2026-09-09] - Configuración inicial del servidor Discord
 
 ### Añadido

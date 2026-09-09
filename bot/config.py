@@ -1,6 +1,7 @@
 """Configuracion privada leida desde .env."""
 from dataclasses import dataclass
 import os
+from pathlib import Path
 from dotenv import load_dotenv
 
 @dataclass(frozen=True)
@@ -16,7 +17,8 @@ class Settings:
     next_video_url: str | None
 
 def load_settings() -> Settings:
-    load_dotenv()
+    # Carga siempre el .env junto a este archivo, aunque se inicie desde la raíz.
+    load_dotenv(Path(__file__).with_name(".env"))
     missing = [key for key in ("DISCORD_TOKEN", "YOUTUBE_API_KEY", "DISCORD_CHANNEL_ID", "OWNER_USER_ID") if not os.getenv(key)]
     if missing:
         raise RuntimeError("Faltan valores en .env: " + ", ".join(missing))
